@@ -6,3 +6,6 @@ best_model.pt
 *.pt  # (Optional: ignore all .pt files)
 *.pth  # (Optional: include other common PyTorch extensions)
 *.h5  # (Optional: for Keras/TensorFlow models)
+
+translation_bpe_v2.vocab
+translation_bpe_v2.model
