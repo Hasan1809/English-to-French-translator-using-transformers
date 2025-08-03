@@ -1,3 +1,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+best_model.pt
+*.pt  # (Optional: ignore all .pt files)
+*.pth  # (Optional: include other common PyTorch extensions)
+*.h5  # (Optional: for Keras/TensorFlow models)
