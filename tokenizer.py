@@ -10,14 +10,12 @@ def create_proper_sentencepiece_model(english_sentences, french_sentences, model
     with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', delete=False, suffix='.txt') as temp_file:
         temp_path = temp_file.name
         
-        # Write all sentences - mix English and French for better shared vocabulary
         total_sentences = 0
         for eng, fr in zip(english_sentences, french_sentences):
-            # Clean and write both sentences
             eng_clean = eng.strip()
             fr_clean = fr.strip()
             
-            if eng_clean and fr_clean:  # Only write non-empty sentences
+            if eng_clean and fr_clean: 
                 temp_file.write(eng_clean + '\n')
                 temp_file.write(fr_clean + '\n')
                 total_sentences += 2
@@ -29,30 +27,26 @@ def create_proper_sentencepiece_model(english_sentences, french_sentences, model
     spm.SentencePieceTrainer.train(
         input=temp_path,
         model_prefix=model_prefix,
-        vocab_size=32000,  # Slightly larger for better coverage
+        vocab_size=32000, 
         model_type='bpe',
         
         # Critical UTF-8 and character settings
         character_coverage=0.9998,  # Very high coverage for accented chars
-        byte_fallback=True,  # Handle any UTF-8 bytes as fallback
+        byte_fallback=True,
         
-        # Sentence processing
-        input_sentence_size=2000000,  # Process many sentences
+        input_sentence_size=2000000,
         shuffle_input_sentence=True,
         max_sentence_length=512,
         
-        # Token IDs
         pad_id=0,
         unk_id=1,
         bos_id=2,
         eos_id=3,
-        user_defined_symbols=['<en>', '<fr>'],  # Language tags
+        user_defined_symbols=['<en>', '<fr>'],
         
-        # Text normalization (important for multilingual)
         normalization_rule_name='nmt_nfkc_cf',
         remove_extra_whitespaces=True,
         
-        # Advanced settings for better tokenization
         split_by_unicode_script=True,
         split_by_number=True,
         split_by_whitespace=True,
@@ -60,7 +54,6 @@ def create_proper_sentencepiece_model(english_sentences, french_sentences, model
         allow_whitespace_only_pieces=True,
         split_digits=True,
         
-        # Training parameters
         num_threads=4,
         train_extremely_large_corpus=False,
         seed_sentencepiece_size=1000000,
@@ -107,16 +100,12 @@ def create_embedding_matrix(sp_model, embedding_dim=300):
     
     print(f"Vocabulary size: {vocab_size}")
     
-    # Initialize embedding matrix
-    embedding_matrix = torch.randn(vocab_size, embedding_dim) * 0.1  # Small random init
+    embedding_matrix = torch.randn(vocab_size, embedding_dim) * 0.1  
     
-    # Fill with FastText vectors
     found_en = found_fr = not_found = special_tokens = 0
     
     for i, piece in enumerate(vocab):
-        # Handle special tokens
         if piece in ['<pad>', '<unk>', '<s>', '</s>', '<en>', '<fr>'] or piece.startswith('▁'):
-            # Keep random initialization for special tokens and space markers
             special_tokens += 1
         elif piece in ft_en:
             embedding_matrix[i] = torch.tensor(ft_en[piece], dtype=torch.float32)
@@ -125,7 +114,6 @@ def create_embedding_matrix(sp_model, embedding_dim=300):
             embedding_matrix[i] = torch.tensor(ft_fr[piece], dtype=torch.float32)
             found_fr += 1
         else:
-            # Try without BPE markers
             clean_piece = piece.replace('▁', '').replace('##', '')
             if clean_piece in ft_en:
                 embedding_matrix[i] = torch.tensor(ft_en[clean_piece], dtype=torch.float32)
@@ -153,7 +141,7 @@ def complete_setup(english_sentences, french_sentences):
     model_path = create_proper_sentencepiece_model(
         english_sentences, 
         french_sentences, 
-        model_prefix='translation_bpe_v2'
+        model_prefix='translation_bpe'
     )
     
     sp = load_tokenizer(model_path)

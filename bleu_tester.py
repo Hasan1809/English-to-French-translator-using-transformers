@@ -8,29 +8,25 @@ import nltk
 def calculate_bleu_score(model, tokenizer, source_sentences, reference_sentences, max_length=50):
     model.eval()
     
-    # Translate all sentences
     translations = []
     for source in source_sentences:
         with torch.no_grad():
             translation = model.translate(source, tokenizer, max_length=max_length)
         translations.append(translation)
     
-    # Tokenize for BLEU calculation (normalize case and punctuation)
     references_tokenized = []
     hypotheses_tokenized = []
     
     for ref, hyp in zip(reference_sentences, translations):
-        # Normalize: lowercase, remove punctuation
         ref_clean = ref.lower().replace('?', '').replace('.', '').replace(',', '').replace('-', ' ')
         hyp_clean = hyp.lower().replace('?', '').replace('.', '').replace(',', '').replace('-', ' ')
         
         ref_tokens = ref_clean.split()
         hyp_tokens = hyp_clean.split()
         
-        references_tokenized.append([ref_tokens])  # BLEU expects list of lists
+        references_tokenized.append([ref_tokens]) 
         hypotheses_tokenized.append(hyp_tokens)
     
-    # Calculate BLEU score with smoothing
     smoothing = SmoothingFunction().method1
     bleu_score = corpus_bleu(references_tokenized, hypotheses_tokenized, smoothing_function=smoothing)
     

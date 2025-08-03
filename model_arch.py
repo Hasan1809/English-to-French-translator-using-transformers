@@ -160,20 +160,12 @@ class TranslationTransformer(nn.Module):
         )
         
         # Get logits for the last position
-        logits = self.fc_out(output[:, -1:, :])  # [batch_size, 1, vocab_size]
+        logits = self.fc_out(output[:, -1:, :])
         
         return logits
     
     def translate(self, src_sentence, tokenizer, max_length=100, beam_size=1, temperature=1.0):
-        """
-        Translate a single sentence
-        Args:
-            src_sentence: string - source sentence
-            tokenizer: SentencePiece tokenizer
-            max_length: maximum target sequence length
-            beam_size: beam search size (1 = greedy)
-            temperature: sampling temperature
-        """
+
         self.eval()
         device = next(self.parameters()).device
         
@@ -216,9 +208,8 @@ class TranslationTransformer(nn.Module):
             translated_text = tokenizer.decode(output_tokens)
             return translated_text
 
-# Example usage and initialization
+
 def create_model(embedding_matrix, vocab_size):
-    """Create and initialize the translation model"""
     model = TranslationTransformer(
         vocab_size=vocab_size,
         embedding_matrix=embedding_matrix,

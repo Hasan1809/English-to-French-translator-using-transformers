@@ -83,7 +83,6 @@ def create_dataloader(english_sentences, french_sentences, sp_model, batch_size=
     
     return dataloader
 
-# Example usage and testing
 def test_dataloader(dataloader, sp_model, num_batches=2):
     
     for i, (src_batch, tgt_batch) in enumerate(dataloader):
@@ -98,10 +97,10 @@ def test_dataloader(dataloader, sp_model, num_batches=2):
         src_tokens = src_batch[0].tolist()
         tgt_tokens = tgt_batch[0].tolist()
         
-        print(f"Source tokens: {src_tokens[:20]}...")  # First 20 tokens
+        print(f"Source tokens: {src_tokens[:20]}...")  
         print(f"Target tokens: {tgt_tokens[:20]}...")
         
-        src_text = sp_model.decode([t for t in src_tokens if t != 0])  # Remove padding
+        src_text = sp_model.decode([t for t in src_tokens if t != 0])  
         tgt_text = sp_model.decode([t for t in tgt_tokens if t != 0])
         
         print(f"Source text: {src_text}")
